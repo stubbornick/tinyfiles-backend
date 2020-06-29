@@ -4,7 +4,8 @@
   "description": "TinyFiles - backend",
   "main": "dist/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "build": "tsc",
+    "start": "node dist/app.js",
     "lint": "eslint src tests --ext .ts --quiet --fix",
     "test": "jest",
     "coverage": "jest --coverage"
