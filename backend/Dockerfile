@@ -2,7 +2,7 @@ FROM node:lts
 
 RUN npm install -g typescript
 
-USER tinyfiles
+USER tinyfiles:tinyfiles
 
 COPY yarn.lock package.json /project/
 WORKDIR /project/
