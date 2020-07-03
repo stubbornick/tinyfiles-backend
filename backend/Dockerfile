@@ -2,13 +2,20 @@ FROM node:lts
 
 RUN npm install -g typescript
 
-USER tinyfiles:tinyfiles
+ARG USER_ID
+ARG GROUP_ID
 
-COPY yarn.lock package.json /project/
-WORKDIR /project/
+RUN deluser node
+
+RUN addgroup --gid $GROUP_ID user
+RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
+USER user
+
+COPY --chown=user:user yarn.lock package.json /app/
+WORKDIR /app/
 RUN yarn install
 
-COPY . /project/
+COPY --chown=user:user . /app/
 RUN yarn run build
 
 CMD yarn run --silent start
