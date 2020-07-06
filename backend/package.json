@@ -8,7 +8,10 @@
     "start": "node dist/src/app.js",
     "lint": "eslint src tests --ext .ts --quiet --fix",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "docker_build": "sudo docker build -t tinyfiles --build-arg USER_ID=`id -u` --build-arg GROUP_ID=`id -g` .",
+    "docker_start": "sudo docker run -p 127.0.0.1:3000:3000 --env APP_HOST=0.0.0.0 --rm --name=tinyfiles -v `pwd`/data:/app/data tinyfiles",
+    "docker_stop": "sudo docker stop tinyfiles"
   },
   "author": "stubbornick",
   "license": "UNLICENSED",
