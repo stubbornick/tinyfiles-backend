@@ -18,6 +18,7 @@ RUN yarn install
 COPY --chown=user:user . /app/
 RUN yarn run build
 
-CMD yarn run --silent start
 EXPOSE 3000
 VOLUME /app/data/
+
+ENTRYPOINT ["/usr/local/bin/yarn", "run", "--silent", "start"]
