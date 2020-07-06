@@ -21,4 +21,5 @@ RUN yarn run build
 EXPOSE 3000
 VOLUME /app/data/
 
-ENTRYPOINT ["/usr/local/bin/yarn", "run", "--silent", "start"]
+# Not using yarn since it answers with error code 1 on SIGTERM and can't propagate SIGINT
+ENTRYPOINT ["/usr/local/bin/node", "dist/src/app.js"]
