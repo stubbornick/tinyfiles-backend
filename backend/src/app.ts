@@ -12,5 +12,5 @@ app.listen(port, host, (err) => {
   if (err) {
     return console.error(err);
   }
-  return console.log(`Server is listening on ${port}`);
+  return console.log(`Server is listening on ${host}:${port}`);
 });
