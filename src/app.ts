@@ -13,17 +13,17 @@ const server = app.listen(port, host, (err) => {
   if (err) {
     return console.error(err);
   }
-  return console.log(`Server is listening on ${host}:${port}`);
+  return console.info(`Server is listening on ${host}:${port}`);
 });
 
 const shutdownManager = new GracefulShutdownManager(server);
 
 const addTerminationHandler = (signal) => {
   process.on(signal, () => {
-    console.log(`${signal} received`);
+    console.info(`${signal} received`);
 
     shutdownManager.terminate(() => {
-      console.log('Server is gracefully terminated');
+      console.info('Server is gracefully terminated');
       process.exit(0);
     });
   });
