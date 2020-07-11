@@ -2,10 +2,10 @@
   "name": "tinyfiles-backend",
   "version": "0.0.1",
   "description": "TinyFiles - backend",
-  "main": "dist/app.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/src/app.js",
+    "start": "node dist/src/server.js",
     "lint": "eslint src tests --ext .ts --quiet --fix",
     "test": "jest",
     "coverage": "jest --coverage",
