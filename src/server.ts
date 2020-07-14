@@ -7,25 +7,29 @@ const host = process.env.APP_HOST || '127.0.0.1';
 app.set('port', port);
 app.set('host', host);
 
-const server = app.listen(port, host, (err) => {
-  if (err) {
-    return console.error(err);
-  }
-  return console.info(`Server is listening on ${host}:${port}`);
-});
+const start = async () => {
+  const server = app.listen(port, host, (err) => {
+    if (err) {
+      return console.error(err);
+    }
+    return console.info(`Server is listening on ${host}:${port}`);
+  });
 
-const shutdownManager = new GracefulShutdownManager(server);
+  const shutdownManager = new GracefulShutdownManager(server);
 
-const addTerminationHandler = (signal) => {
-  process.on(signal, () => {
-    console.info(`${signal} received`);
+  Object.values<NodeJS.Signals>(['SIGTERM', 'SIGINT']).forEach((signal) => {
+    process.on(signal, () => {
+      console.info(`${signal} received`);
 
-    shutdownManager.terminate(() => {
-      console.info('Server is gracefully terminated');
-      process.exit(0);
+      shutdownManager.terminate(() => {
+        console.info('Server is gracefully terminated');
+        process.exit(0);
+      });
     });
   });
 };
 
-addTerminationHandler('SIGTERM');
-addTerminationHandler('SIGINT');
+start().catch((error) => {
+  console.error('Error during server starting:', error);
+  process.exit(1);
+});
