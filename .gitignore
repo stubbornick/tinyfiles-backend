@@ -11,6 +11,9 @@ pids
 *.seed
 *.pid.lock
 
+# App data
+data
+
 # Coverage directory used by tools like istanbul
 coverage
 
