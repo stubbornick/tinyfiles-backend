@@ -1,17 +1,24 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2020,
+    project: 'tsconfig.json',
     sourceType: 'module',
-    project: './tsconfig.json'
   },
+  plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
-    'airbnb-typescript/base',
-    'plugin:import/typescript',
-    'plugin:prettier/recommended',
-    'prettier/@typescript-eslint'
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'prettier/@typescript-eslint',
   ],
+  root: true,
+  env: {
+    node: true,
+    jest: true,
+  },
   rules: {
-    'no-console': ['error', { allow: ['info', 'warn', 'error'] }]
-  }
+    '@typescript-eslint/interface-name-prefix': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+  },
 };

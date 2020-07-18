@@ -22,4 +22,4 @@ EXPOSE 3000
 VOLUME /app/data/
 
 # Not using yarn since it answers with error code 1 on SIGTERM and can't propagate SIGINT
-ENTRYPOINT ["/usr/local/bin/node", "dist/src/server.js"]
+CMD ["npm", "run", "--silent", "start:prod"]
