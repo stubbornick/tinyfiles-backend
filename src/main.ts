@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import 'source-map-support/register';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
