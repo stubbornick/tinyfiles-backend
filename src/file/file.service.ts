@@ -1,7 +1,7 @@
 import { Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult } from 'typeorm';
-import Base58 from 'base-58';
+import * as Base58 from 'base-58';
 import { randomBytes } from 'crypto';
 
 import { FileEntity } from './file.entity';
@@ -41,6 +41,6 @@ export class FileService {
   }
 
   generateId(): string {
-    return Base58.encode(randomBytes(8));
+    return Base58.encode(randomBytes(5));
   }
 }
