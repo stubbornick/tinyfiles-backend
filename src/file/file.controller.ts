@@ -10,7 +10,7 @@ export class FileController {
 
   @Get()
   async findAll(): Promise<FileEntity[]> {
-    return await this.fileService.findAll();
+    return this.fileService.findAll();
   }
 
   @Post()

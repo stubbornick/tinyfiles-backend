@@ -16,7 +16,7 @@ export class FileService {
   ) {}
 
   async findAll(): Promise<FileEntity[]> {
-    return await this.fileRepository.find();
+    return this.fileRepository.find();
   }
 
   async create(fileData: CreateFileDto): Promise<FileEntity> {
@@ -37,7 +37,7 @@ export class FileService {
   }
 
   async delete(fileId: string): Promise<DeleteResult> {
-    return await this.fileRepository.delete({ id: fileId });
+    return this.fileRepository.delete({ id: fileId });
   }
 
   generateId(): string {
