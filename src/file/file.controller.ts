@@ -14,12 +14,12 @@ export class FileController {
   }
 
   @Post()
-  async create(@Body('file') fileData: CreateFileDto) {
+  async create(@Body() fileData: CreateFileDto) {
     return this.fileService.create(fileData);
   }
 
   @Put(':id')
-  async update(@Param() params, @Body('file') fileData: CreateFileDto) {
+  async update(@Param() params, @Body() fileData: CreateFileDto) {
     return this.fileService.update(params.id, fileData);
   }
 
