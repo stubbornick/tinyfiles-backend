@@ -8,8 +8,8 @@ export class FileEntity {
   @Column()
   name: string;
 
-  @Column({ default: false })
-  uploaded: boolean;
+  @Column({ nullable: true })
+  uploaded_at?: Date;
 
   @Column({ nullable: true })
   size?: number;
