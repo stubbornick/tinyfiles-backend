@@ -1,8 +1,8 @@
 {
   "name": "tinyfiles-backend",
   "version": "0.0.1",
-  "description": "TinyFiles - backend",
-  "author": "",
+  "description": "Tinyfiles - backend",
+  "author": "stubbornick",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
