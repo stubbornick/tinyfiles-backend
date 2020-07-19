@@ -1,6 +1,8 @@
 import { Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult } from 'typeorm';
+import Base58 from 'base-58';
+import { randomBytes } from 'crypto';
 
 import { FileEntity } from './file.entity';
 import { FileRO } from './file.interface';
@@ -29,8 +31,8 @@ export class FileService {
 
   async update(fileId: string, fileData: CreateFileDto): Promise<FileRO> {
     const toUpdate = await this.fileRepository.findOne({ id: fileId });
-    const updated = Object.assign(toUpdate, fileData);
-    const file = await this.fileRepository.save(updated);
+    toUpdate.name = fileData.name;
+    const file = await this.fileRepository.save(toUpdate);
     return { file };
   }
 
@@ -39,6 +41,6 @@ export class FileService {
   }
 
   generateId(): string {
-    return Math.random().toString(36).substr(2, 11);
+    return Base58.encode(randomBytes(8));
   }
 }
