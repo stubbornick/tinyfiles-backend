@@ -1,3 +1,6 @@
+import { config } from 'dotenv'
+config()
+
 import { NestFactory } from '@nestjs/core';
 import 'source-map-support/register';
 import { AppModule } from './app.module';
