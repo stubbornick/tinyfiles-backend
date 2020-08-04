@@ -33,6 +33,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
+    "source-map-support": "^0.5.19",
     "sqlite3": "^5.0.0",
     "typeorm": "^0.2.25"
   },
@@ -52,7 +53,6 @@
     "husky": "^4.2.5",
     "jest": "26.0.1",
     "prettier": "^1.19.1",
-    "source-map-support": "^0.5.19",
     "supertest": "^4.0.2",
     "ts-jest": "26.1.0",
     "ts-loader": "^6.2.1",
