@@ -8,6 +8,8 @@ import { FileEntity } from './file.entity';
 import { FileRO } from './file.interface';
 import { CreateFileDto } from './dto/create-file.dto';
 
+const generateFileId = () => Base58.encode(randomBytes(5));
+
 @Injectable()
 export class FileService {
   constructor(
@@ -15,13 +17,13 @@ export class FileService {
     private readonly fileRepository: Repository<FileEntity>
   ) {}
 
-  async findAll(): Promise<FileEntity[]> {
+  public async findAll(): Promise<FileEntity[]> {
     return this.fileRepository.find();
   }
 
-  async create(fileData: CreateFileDto): Promise<FileEntity> {
+  public async create(fileData: CreateFileDto): Promise<FileEntity> {
     const file = new FileEntity();
-    file.id = this.generateId();
+    file.id = generateFileId();
     file.name = fileData.name;
 
     const newFile = await this.fileRepository.save(file);
@@ -29,18 +31,14 @@ export class FileService {
     return newFile;
   }
 
-  async update(fileId: string, fileData: CreateFileDto): Promise<FileRO> {
+  public async update(fileId: string, fileData: CreateFileDto): Promise<FileRO> {
     const toUpdate = await this.fileRepository.findOne({ id: fileId });
     toUpdate.name = fileData.name;
     const file = await this.fileRepository.save(toUpdate);
     return { file };
   }
 
-  async delete(fileId: string): Promise<DeleteResult> {
+  public async delete(fileId: string): Promise<DeleteResult> {
     return this.fileRepository.delete({ id: fileId });
-  }
-
-  generateId(): string {
-    return Base58.encode(randomBytes(5));
   }
 }

@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { FileService } from './file.service';
@@ -13,8 +13,4 @@ import { FileController } from './file.controller';
   ],
   exports: []
 })
-export class FileModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer) {
-    // empty
-  }
-}
+export class FileModule {}
