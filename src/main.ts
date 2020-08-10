@@ -1,10 +1,9 @@
 /* eslint-disable import/first */
-import { config } from 'dotenv';
-
-config();
+import 'dotenv/config';
+import 'source-map-support/register';
 
 import { NestFactory } from '@nestjs/core';
-import 'source-map-support/register';
+
 import { AppModule } from './app.module';
 
 

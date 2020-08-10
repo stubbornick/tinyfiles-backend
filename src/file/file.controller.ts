@@ -1,20 +1,20 @@
 import {
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
   Body,
   Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { DeleteResult } from 'typeorm';
 
-import { FileEntity } from './file.entity';
-import { FileService } from './file.service';
 import { FileCreateRequestDto } from './dto/file-create.request.dto';
 import { FileUploadResponseDto } from './dto/file-upload.response.dto';
+import { FileEntity } from './file.entity';
+import { FileService } from './file.service';
 
 @Controller('files')
 export class FileController {

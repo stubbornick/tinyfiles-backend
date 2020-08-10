@@ -4,7 +4,10 @@ module.exports = {
     project: 'tsconfig.json',
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
+  plugins: [
+    '@typescript-eslint/eslint-plugin',
+    'simple-import-sort',
+  ],
   extends: [
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -28,6 +31,11 @@ module.exports = {
     'import/no-default-export': 'error',
 
     semi: ['error', 'always'],
-    quotes: ['error', 'single']
+    quotes: ['error', 'single'],
+    'simple-import-sort/sort': 'error',
+    'sort-imports': 'off',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error'
   },
 };
