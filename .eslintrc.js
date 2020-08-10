@@ -21,12 +21,13 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'class-methods-use-this': ['error', { 'exceptMethods': ['onModuleInit'] }],
 
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html
     'import/prefer-default-export': 'off',
     'import/no-default-export': 'error',
 
     semi: ['error', 'always'],
-    quotes: ["error", "single"]
+    quotes: ['error', 'single']
   },
 };
