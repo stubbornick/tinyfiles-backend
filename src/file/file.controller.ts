@@ -1,31 +1,49 @@
-import { Get, Post, Put, Delete, Param, Body, Controller } from '@nestjs/common';
+import {
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Controller,
+  Req,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { DeleteResult } from 'typeorm';
 
 import { FileEntity } from './file.entity';
 import { FileService } from './file.service';
-import { FileRO } from './file.interface';
-import { CreateFileDto } from './dto/create-file.dto';
+import { FileCreateRequestDto } from './dto/file-create.request.dto';
+import { FileUploadResponseDto } from './dto/file-upload.response.dto';
 
 @Controller('files')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Get()
-  public async findAll(): Promise<FileEntity[]> {
+  public findAll(): Promise<FileEntity[]> {
     return this.fileService.findAll();
   }
 
   @Post()
-  public async create(@Body() fileData: CreateFileDto): Promise<FileEntity> {
+  public create(@Body() fileData: FileCreateRequestDto): Promise<FileEntity> {
     return this.fileService.create(fileData);
   }
 
-  @Put(':id')
-  public async update(
+  @Patch(':id')
+  public update(
     @Param('id') fileId: string,
-    @Body() fileData: CreateFileDto
-  ) : Promise<FileRO> {
+    @Body() fileData: FileCreateRequestDto
+  ) : Promise<FileEntity> {
     return this.fileService.update(fileId, fileData);
+  }
+
+  @Patch('upload/:id')
+  public uploadFile(
+    @Param('id') fileId: string,
+    @Req() request: Request
+  ): Promise<FileUploadResponseDto> {
+    return this.fileService.upload(fileId, request);
   }
 
   @Delete(':id')

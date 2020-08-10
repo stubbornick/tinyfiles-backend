@@ -11,6 +11,6 @@ export class FileEntity {
   @Column({ nullable: true })
   uploaded_at?: Date;
 
-  @Column({ nullable: true })
-  size?: number;
+  @Column()
+  size: number;
 }
