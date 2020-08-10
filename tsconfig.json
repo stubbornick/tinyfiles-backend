@@ -12,6 +12,6 @@
     "baseUrl": "./",
     "incremental": true
   },
-  "include": ["src", "ormconfig.js"],
+  "include": ["src", "test", "ormconfig.js"],
   "exclude": ["dist", "data"]
 }
