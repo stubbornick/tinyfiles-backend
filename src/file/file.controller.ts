@@ -7,8 +7,9 @@ import {
   Patch,
   Post,
   Req,
+  Res,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { DeleteResult } from 'typeorm';
 
 import { FileCreateRequestDto } from './dto/file-create.request.dto';
@@ -39,7 +40,7 @@ export class FileController {
   }
 
   @Patch('upload/:id')
-  public uploadFile(
+  public upload(
     @Param('id') fileId: string,
     @Req() request: Request
   ): Promise<FileUploadResponseDto> {
@@ -47,7 +48,15 @@ export class FileController {
   }
 
   @Delete(':id')
-  public async delete(@Param('id') fileId: string): Promise<DeleteResult> {
+  public delete(@Param('id') fileId: string): Promise<DeleteResult> {
     return this.fileService.delete(fileId);
+  }
+
+  @Get('download/:id/:name')
+  public async download(
+    @Param('id') fileId: string,
+    @Res() response: Response,
+  ): Promise<void> {
+    await this.fileService.download(fileId, response);
   }
 }

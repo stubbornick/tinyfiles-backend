@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as Base58 from 'base-58';
 import { plainToClass } from 'class-transformer';
 import { randomBytes } from 'crypto';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DeleteResult,Repository } from 'typeorm';
@@ -63,13 +63,13 @@ export class FileService {
     fileId: string,
     request: Request,
   ): Promise<FileUploadResponseDto> {
-    const fileInDb = await this.fileRepository.findOne({ id: fileId });
+    const fileEntity = await this.fileRepository.findOne({ id: fileId });
 
-    if (!fileInDb) {
+    if (!fileEntity) {
       throw new BadRequestException(`Cannot find file with id = '${fileId}'`);
     }
 
-    if (fileInDb.uploaded_at) {
+    if (fileEntity.uploaded_at) {
       throw new BadRequestException(
         `File with id = '${fileId}' is already uploaded`
       );
@@ -88,11 +88,7 @@ export class FileService {
 
     const filePath = getFilePath(fileId);
     const fileStream = fs.createWriteStream(filePath, { flags: 'a' });
-
-    request.on('data', (data: Buffer) => {
-      fileStream.write(data);
-      console.log(`Written chunk of ${data.length} byte`);
-    });
+    request.pipe(fileStream);
 
     if (!await uploadPromise) {
       fileStream.close();
@@ -109,9 +105,9 @@ export class FileService {
   }
 
   public async delete(fileId: string): Promise<DeleteResult> {
-    const fileInDb = await this.fileRepository.findOne({ id: fileId });
+    const fileEntity = await this.fileRepository.findOne({ id: fileId });
 
-    if (!fileInDb) {
+    if (!fileEntity) {
       throw new BadRequestException(`Cannot find file with id = '${fileId}'`);
     }
 
@@ -125,5 +121,21 @@ export class FileService {
     }
 
     return this.fileRepository.delete({ id: fileId });
+  }
+
+  public async download(fileId: string, response: Response): Promise<void> {
+    const fileEntity = await this.fileRepository.findOne({ id: fileId });
+
+    if (!fileEntity) {
+      throw new BadRequestException(`Cannot find file with id = '${fileId}'`);
+    }
+
+    if (!fileEntity.uploaded_at) {
+      throw new BadRequestException(`File with id = '${fileId}' is not uploaded`);
+    }
+
+    response.sendFile(fileId, {
+      root: filesDirectory
+    });
   }
 }
