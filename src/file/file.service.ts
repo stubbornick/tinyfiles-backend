@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as Base58 from 'base-58';
 import { plainToClass } from 'class-transformer';
@@ -66,7 +72,7 @@ export class FileService {
     const fileEntity = await this.fileRepository.findOne({ id: fileId });
 
     if (!fileEntity) {
-      throw new BadRequestException(`Cannot find file with id = '${fileId}'`);
+      throw new NotFoundException(`File with id = '${fileId}' not found`);
     }
 
     if (fileEntity.uploaded_at) {
@@ -108,7 +114,7 @@ export class FileService {
     const fileEntity = await this.fileRepository.findOne({ id: fileId });
 
     if (!fileEntity) {
-      throw new BadRequestException(`Cannot find file with id = '${fileId}'`);
+      throw new NotFoundException(`File with id = '${fileId}' not found`);
     }
 
     const filePath = getFilePath(fileId);
@@ -127,7 +133,7 @@ export class FileService {
     const fileEntity = await this.fileRepository.findOne({ id: fileId });
 
     if (!fileEntity) {
-      throw new BadRequestException(`Cannot find file with id = '${fileId}'`);
+      throw new NotFoundException(`File with id = '${fileId}' not found`);
     }
 
     if (!fileEntity.uploaded_at) {
