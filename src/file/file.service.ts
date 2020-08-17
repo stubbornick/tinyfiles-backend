@@ -83,13 +83,27 @@ export class FileService {
     }
 
     const uploadPromise = new Promise((resolve) => {
+      let totalBytes = 0;
+
+      request.on('data', (data) => {
+        totalBytes += data.length;
+
+        if (totalBytes > fileEntity.size) {
+          resolve(
+            new BadRequestException(
+              'Uploaded more bytes than specified file size'
+            )
+          );
+        }
+      });
+
       request.on('end', () => {
-        resolve(true);
+        resolve(null);
       });
 
       request.on('error', (error) => {
         this.logger.error(`Upload error: ${inspect(error)}`);
-        resolve(false);
+        resolve(error);
       });
     });
 
@@ -97,9 +111,14 @@ export class FileService {
     const fileStream = fs.createWriteStream(filePath, { flags: 'a' });
     request.pipe(fileStream);
 
-    if (!await uploadPromise) {
+    const uploadError = await uploadPromise;
+
+    if (uploadError) {
       fileStream.close();
       await fs.promises.unlink(filePath);
+      if (uploadError instanceof BadRequestException) {
+        throw uploadError;
+      }
       throw new InternalServerErrorException();
     }
 
