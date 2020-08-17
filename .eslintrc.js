@@ -32,7 +32,7 @@ module.exports = {
 
     semi: ['error', 'always'],
     quotes: ['error', 'single'],
-    'simple-import-sort/sort': 'error',
+    'simple-import-sort/sort': 'warn',
     'sort-imports': 'off',
     'import/first': 'error',
     'import/newline-after-import': 'error',
