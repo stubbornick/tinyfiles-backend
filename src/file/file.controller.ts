@@ -39,17 +39,17 @@ export class FileController {
     return this.fileService.update(fileId, fileData);
   }
 
+  @Delete(':id')
+  public delete(@Param('id') fileId: string): Promise<DeleteResult> {
+    return this.fileService.delete(fileId);
+  }
+
   @Patch('upload/:id')
   public upload(
     @Param('id') fileId: string,
     @Req() request: Request
   ): Promise<FileUploadResponseDto> {
     return this.fileService.upload(fileId, request);
-  }
-
-  @Delete(':id')
-  public delete(@Param('id') fileId: string): Promise<DeleteResult> {
-    return this.fileService.delete(fileId);
   }
 
   @Get('download/:id/:name')

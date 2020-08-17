@@ -21,7 +21,7 @@ import { FileEntity } from './file.entity';
 
 const filesDirectory = process.env.FILES_DIR || 'data/files';
 const generateFileId = () => Base58.encode(randomBytes(5));
-const getFilePath = (fileId) => path.join(filesDirectory, fileId);
+const getFilePath = (fileId: string) => path.join(filesDirectory, fileId);
 
 @Injectable()
 export class FileService {
@@ -52,7 +52,8 @@ export class FileService {
   public async create(fileData: FileCreateRequestDto): Promise<FileEntity> {
     const file = plainToClass(FileEntity, fileData);
     file.id = generateFileId();
-    return this.fileRepository.save(file);
+    await this.fileRepository.insert(file);
+    return file;
   }
 
   public async update(
@@ -105,7 +106,8 @@ export class FileService {
     fileStream.close();
 
     const entity = await this.fileRepository.save({
-      id: fileId, uploaded_at: new Date
+      id: fileId,
+      uploaded_at: new Date()
     });
     return plainToClass(FileUploadResponseDto, entity);
   }
