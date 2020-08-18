@@ -66,6 +66,25 @@ export class FileService {
     return file;
   }
 
+  public async delete(fileId: string): Promise<DeleteResult> {
+    const fileEntity = await this.fileRepository.findOne({ id: fileId });
+
+    if (!fileEntity) {
+      throw new NotFoundException(`File with id = '${fileId}' not found`);
+    }
+
+    const filePath = getFilePath(fileId);
+    try {
+      await fs.promises.unlink(filePath);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    return this.fileRepository.delete({ id: fileId });
+  }
+
   public async upload(
     fileId: string,
     request: Request,
@@ -137,25 +156,6 @@ export class FileService {
       uploaded_at: new Date()
     });
     return plainToClass(FileUploadResponseDto, entity);
-  }
-
-  public async delete(fileId: string): Promise<DeleteResult> {
-    const fileEntity = await this.fileRepository.findOne({ id: fileId });
-
-    if (!fileEntity) {
-      throw new NotFoundException(`File with id = '${fileId}' not found`);
-    }
-
-    const filePath = getFilePath(fileId);
-    try {
-      await fs.promises.unlink(filePath);
-    } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error;
-      }
-    }
-
-    return this.fileRepository.delete({ id: fileId });
   }
 
   public async download(fileId: string, response: Response): Promise<void> {
