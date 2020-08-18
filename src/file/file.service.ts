@@ -98,6 +98,14 @@ export class FileService {
       });
 
       request.on('end', () => {
+        if (totalBytes !== fileEntity.size) {
+          resolve(
+            new BadRequestException(
+              'Uploaded bytes count is not equal to specified file size'
+            )
+          );
+        }
+
         resolve(null);
       });
 
