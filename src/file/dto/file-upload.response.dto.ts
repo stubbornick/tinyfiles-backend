@@ -1,9 +1,11 @@
 export class FileUploadResponseDto {
-  readonly id: string;
+  public id: string;
 
-  readonly name: string;
+  public name: string;
 
-  readonly size: number;
+  public size: number;
 
-  readonly uploaded_at: Date;
+  public uploadedSize?: number;
+
+  public uploaded_at: Date;
 }

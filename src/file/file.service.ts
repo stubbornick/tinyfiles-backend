@@ -19,13 +19,24 @@ import { FileCreateRequestDto } from './dto/file-create.request.dto';
 import { FileUploadResponseDto } from './dto/file-upload.response.dto';
 import { FileEntity } from './file.entity';
 
-const filesDirectory = process.env.FILES_DIR || 'data/files';
 const generateFileId = () => Base58.encode(randomBytes(5));
-const getFilePath = (fileId: string) => path.join(filesDirectory, fileId);
+
+const getFileSize = async (filePath: string) => {
+  try {
+    await fs.promises.access(filePath);
+  } catch (error) {
+    return 0;
+  }
+
+  const stats = await fs.promises.stat(filePath);
+  return stats.size;
+};
 
 @Injectable()
 export class FileService {
   private readonly logger = new Logger(FileService.name);
+
+  private readonly filesDirectory = process.env.FILES_DIR || 'data/files';
 
   constructor(
     @InjectRepository(FileEntity)
@@ -34,10 +45,10 @@ export class FileService {
 
   async onModuleInit(): Promise<void> {
     try {
-      await fs.promises.access(filesDirectory);
+      await fs.promises.access(this.filesDirectory);
     } catch(error) {
       if (error.code === 'ENOENT') {
-        await fs.promises.mkdir(filesDirectory);
+        await fs.promises.mkdir(this.filesDirectory);
         return;
       }
 
@@ -73,7 +84,7 @@ export class FileService {
       throw new NotFoundException(`File with id = '${fileId}' not found`);
     }
 
-    const filePath = getFilePath(fileId);
+    const filePath = this.getFilePath(fileId);
     try {
       await fs.promises.unlink(filePath);
     } catch (error) {
@@ -89,7 +100,7 @@ export class FileService {
     fileId: string,
     request: Request,
   ): Promise<FileUploadResponseDto> {
-    const fileEntity = await this.fileRepository.findOne({ id: fileId });
+    let fileEntity = await this.fileRepository.findOne({ id: fileId });
 
     if (!fileEntity) {
       throw new NotFoundException(`File with id = '${fileId}' not found`);
@@ -101,30 +112,21 @@ export class FileService {
       );
     }
 
-    const uploadPromise = new Promise((resolve) => {
-      let totalBytes = 0;
+    const filePath = this.getFilePath(fileId);
+    let uploadedSize = await getFileSize(filePath);
 
+    const uploadPromise: Promise<Error | null> = new Promise((resolve) => {
       request.on('data', (data) => {
-        totalBytes += data.length;
+        uploadedSize += data.length;
 
-        if (totalBytes > fileEntity.size) {
-          resolve(
-            new BadRequestException(
-              'Uploaded more bytes than specified file size'
-            )
-          );
+        if (uploadedSize > fileEntity.size) {
+          resolve(new BadRequestException(
+            'Uploaded more bytes than specified file size'
+          ));
         }
       });
 
       request.on('end', () => {
-        if (totalBytes !== fileEntity.size) {
-          resolve(
-            new BadRequestException(
-              'Uploaded bytes count is not equal to specified file size'
-            )
-          );
-        }
-
         resolve(null);
       });
 
@@ -134,14 +136,13 @@ export class FileService {
       });
     });
 
-    const filePath = getFilePath(fileId);
     const fileStream = fs.createWriteStream(filePath, { flags: 'a' });
     request.pipe(fileStream);
 
     const uploadError = await uploadPromise;
+    fileStream.close();
 
     if (uploadError) {
-      fileStream.close();
       await fs.promises.unlink(filePath);
       if (uploadError instanceof BadRequestException) {
         throw uploadError;
@@ -149,13 +150,16 @@ export class FileService {
       throw new InternalServerErrorException();
     }
 
-    fileStream.close();
+    if (uploadedSize === fileEntity.size) {
+      fileEntity = await this.fileRepository.save({
+        id: fileId,
+        uploaded_at: new Date()
+      });
+    }
 
-    const entity = await this.fileRepository.save({
-      id: fileId,
-      uploaded_at: new Date()
-    });
-    return plainToClass(FileUploadResponseDto, entity);
+    const dto = plainToClass(FileUploadResponseDto, fileEntity);
+    dto.uploadedSize = uploadedSize;
+    return dto;
   }
 
   public async download(fileId: string, response: Response): Promise<void> {
@@ -170,7 +174,11 @@ export class FileService {
     }
 
     response.sendFile(fileId, {
-      root: filesDirectory
+      root: this.filesDirectory
     });
+  }
+
+  private getFilePath(fileId: string): string {
+    return path.join(this.filesDirectory, fileId);
   }
 }
