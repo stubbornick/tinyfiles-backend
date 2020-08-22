@@ -174,7 +174,10 @@ export class FileService {
     }
 
     response.sendFile(fileId, {
-      root: this.filesDirectory
+      root: this.filesDirectory,
+      headers: {
+        'Content-Disposition': 'attachment',
+      }
     });
   }
 
