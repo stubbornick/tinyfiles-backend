@@ -9,7 +9,7 @@ export class FileEntity {
   name: string;
 
   @Column({ nullable: true })
-  uploaded_at?: Date;
+  uploadedAt?: Date;
 
   @Column()
   size: number;

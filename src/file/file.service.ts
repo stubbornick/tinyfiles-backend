@@ -106,7 +106,7 @@ export class FileService {
       throw new NotFoundException(`File with id = '${fileId}' not found`);
     }
 
-    if (fileEntity.uploaded_at) {
+    if (fileEntity.uploadedAt) {
       throw new BadRequestException(
         `File with id = '${fileId}' is already uploaded`
       );
@@ -153,7 +153,7 @@ export class FileService {
     if (uploadedSize === fileEntity.size) {
       fileEntity = await this.fileRepository.save({
         id: fileId,
-        uploaded_at: new Date()
+        uploadedAt: new Date()
       });
     }
 
@@ -169,7 +169,7 @@ export class FileService {
       throw new NotFoundException(`File with id = '${fileId}' not found`);
     }
 
-    if (!fileEntity.uploaded_at) {
+    if (!fileEntity.uploadedAt) {
       throw new BadRequestException(`File with id = '${fileId}' is not uploaded`);
     }
 

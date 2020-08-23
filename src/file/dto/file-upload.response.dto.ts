@@ -7,5 +7,5 @@ export class FileUploadResponseDto {
 
   public uploadedSize?: number;
 
-  public uploaded_at: Date;
+  public uploadedAt: Date;
 }
