@@ -11,15 +11,14 @@ RUN addgroup --gid $GROUP_ID user
 RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
 USER user
 
-COPY --chown=user:user yarn.lock package.json /app/
+COPY --chown=user:user package-lock.json package.json /app/
 WORKDIR /app/
-RUN yarn install
+RUN npm install
 
 COPY --chown=user:user . /app/
-RUN yarn run build
+RUN npm run build
 
 EXPOSE 3000
 VOLUME /app/data/
 
-# Not using yarn since it answers with error code 1 on SIGTERM and can't propagate SIGINT
 CMD ["npm", "run", "--silent", "start:prod"]
