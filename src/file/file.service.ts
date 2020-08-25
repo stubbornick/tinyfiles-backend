@@ -16,21 +16,10 @@ import { DeleteResult,Repository } from 'typeorm';
 import { inspect } from 'util';
 
 import { FileCreateRequestDto } from './dto/file-create.request.dto';
-import { FileUploadResponseDto } from './dto/file-upload.response.dto';
+import { FileResponseDto } from './dto/file.response.dto';
 import { FileEntity } from './file.entity';
 
 const generateFileId = () => Base58.encode(randomBytes(5));
-
-const getFileSize = async (filePath: string) => {
-  try {
-    await fs.promises.access(filePath);
-  } catch (error) {
-    return 0;
-  }
-
-  const stats = await fs.promises.stat(filePath);
-  return stats.size;
-};
 
 @Injectable()
 export class FileService {
@@ -56,25 +45,23 @@ export class FileService {
     }
   }
 
-  public async findAll(): Promise<FileEntity[]> {
-    return this.fileRepository.find();
+  public async findAll(): Promise<FileResponseDto[]> {
+    const files = await this.fileRepository.find();
+
+    return Promise.all(files.map(async (file) => {
+      const dto = plainToClass(FileResponseDto, file);
+      dto.uploadedSize = await this.getUploadedFileSize(file.id);
+      return dto;
+    }));
   }
 
-  public async create(fileData: FileCreateRequestDto): Promise<FileEntity> {
+  public async create(fileData: FileCreateRequestDto): Promise<FileResponseDto> {
     const file = plainToClass(FileEntity, fileData);
     file.id = generateFileId();
     await this.fileRepository.insert(file);
-    return file;
-  }
-
-  public async update(
-    fileId: string,
-    fileData: FileCreateRequestDto
-  ): Promise<FileEntity> {
-    const toUpdate = await this.fileRepository.findOne({ id: fileId });
-    toUpdate.name = fileData.name;
-    const file = await this.fileRepository.save(toUpdate);
-    return file;
+    const dto = plainToClass(FileResponseDto, file);
+    dto.uploadedSize = 0;
+    return dto;
   }
 
   public async delete(fileId: string): Promise<DeleteResult> {
@@ -99,7 +86,7 @@ export class FileService {
   public async upload(
     fileId: string,
     request: Request,
-  ): Promise<FileUploadResponseDto> {
+  ): Promise<FileResponseDto> {
     let fileEntity = await this.fileRepository.findOne({ id: fileId });
 
     if (!fileEntity) {
@@ -112,8 +99,7 @@ export class FileService {
       );
     }
 
-    const filePath = this.getFilePath(fileId);
-    let uploadedSize = await getFileSize(filePath);
+    let uploadedSize = await this.getUploadedFileSize(fileId);
 
     const uploadPromise: Promise<Error | null> = new Promise((resolve) => {
       request.on('data', (data) => {
@@ -136,6 +122,7 @@ export class FileService {
       });
     });
 
+    const filePath = this.getFilePath(fileId);
     const fileStream = fs.createWriteStream(filePath, { flags: 'a' });
     request.pipe(fileStream);
 
@@ -157,7 +144,7 @@ export class FileService {
       });
     }
 
-    const dto = plainToClass(FileUploadResponseDto, fileEntity);
+    const dto = plainToClass(FileResponseDto, fileEntity);
     dto.uploadedSize = uploadedSize;
     return dto;
   }
@@ -184,4 +171,17 @@ export class FileService {
   private getFilePath(fileId: string): string {
     return path.join(this.filesDirectory, fileId);
   }
+
+  private async getUploadedFileSize(fileId: string): Promise<number> {
+    const filePath = this.getFilePath(fileId);
+
+    try {
+      await fs.promises.access(filePath);
+    } catch (error) {
+      return 0;
+    }
+
+    const stats = await fs.promises.stat(filePath);
+    return stats.size;
+  };
 }

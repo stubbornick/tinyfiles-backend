@@ -13,7 +13,7 @@ import { Request, Response } from 'express';
 import { DeleteResult } from 'typeorm';
 
 import { FileCreateRequestDto } from './dto/file-create.request.dto';
-import { FileUploadResponseDto } from './dto/file-upload.response.dto';
+import { FileResponseDto } from './dto/file.response.dto';
 import { FileEntity } from './file.entity';
 import { FileService } from './file.service';
 
@@ -31,14 +31,6 @@ export class FileController {
     return this.fileService.create(fileData);
   }
 
-  @Patch(':id')
-  public update(
-    @Param('id') fileId: string,
-    @Body() fileData: FileCreateRequestDto
-  ) : Promise<FileEntity> {
-    return this.fileService.update(fileId, fileData);
-  }
-
   @Delete(':id')
   public delete(@Param('id') fileId: string): Promise<DeleteResult> {
     return this.fileService.delete(fileId);
@@ -48,7 +40,7 @@ export class FileController {
   public upload(
     @Param('id') fileId: string,
     @Req() request: Request
-  ): Promise<FileUploadResponseDto> {
+  ): Promise<FileResponseDto> {
     return this.fileService.upload(fileId, request);
   }
 
