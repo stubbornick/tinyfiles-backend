@@ -3,12 +3,13 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as Base58 from 'base-58';
 import { plainToClass } from 'class-transformer';
 import { randomBytes } from 'crypto';
+import * as diskusage from 'diskusage';
 import { Request, Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -26,6 +27,16 @@ export class FileService {
   private readonly logger = new Logger(FileService.name);
 
   private readonly filesDirectory = process.env.FILES_DIR || 'data/files';
+
+  private readonly maxFileSize = Number.parseInt(
+    process.env.MAX_FILE_SIZE,
+    10,
+  ) || 1024*1024*1024*5; // 5GB
+
+  private readonly reservedSize = Number.parseInt(
+    process.env.RESERVED_SIZE,
+    10,
+  ) || 1024*1024*100; // 100Mb
 
   constructor(
     @InjectRepository(FileEntity)
@@ -56,6 +67,23 @@ export class FileService {
   }
 
   public async create(fileData: FileCreateRequestDto): Promise<FileResponseDto> {
+    if (fileData.size > this.maxFileSize) {
+      throw new BadRequestException(
+        `File exceeded maximum size: ${this.maxFileSize}`,
+      );
+    }
+
+    const diskUsage = (await diskusage.check(this.filesDirectory));
+    const availableSpace = diskUsage.available - this.reservedSize;
+    if (fileData.size > availableSpace) {
+      this.logger.error(
+        'Not enought disk space to store user\'s file. '
+        + `File size/disk available: ${fileData.size}/${availableSpace}`,
+      );
+
+      throw new BadRequestException('File is too large');
+    }
+
     const file = plainToClass(FileEntity, fileData);
     file.id = generateFileId();
     await this.fileRepository.insert(file);
