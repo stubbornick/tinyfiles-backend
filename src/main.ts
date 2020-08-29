@@ -14,7 +14,7 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV === 'development') {
     app.enableCors({
-      origin: '*'
+      origin: '*',
     });
   }
 

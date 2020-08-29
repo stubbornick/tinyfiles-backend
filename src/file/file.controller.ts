@@ -39,7 +39,7 @@ export class FileController {
   @Patch('upload/:id')
   public upload(
     @Param('id') fileId: string,
-    @Req() request: Request
+    @Req() request: Request,
   ): Promise<FileResponseDto> {
     return this.fileService.upload(fileId, request);
   }

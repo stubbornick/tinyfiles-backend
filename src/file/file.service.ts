@@ -40,7 +40,7 @@ export class FileService {
 
   constructor(
     @InjectRepository(FileEntity)
-    private readonly fileRepository: Repository<FileEntity>
+    private readonly fileRepository: Repository<FileEntity>,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -123,7 +123,7 @@ export class FileService {
 
     if (fileEntity.uploadedAt) {
       throw new BadRequestException(
-        `File with id = '${fileId}' is already uploaded`
+        `File with id = '${fileId}' is already uploaded`,
       );
     }
 
@@ -135,7 +135,7 @@ export class FileService {
 
         if (uploadedSize > fileEntity.size) {
           resolve(new BadRequestException(
-            'Uploaded more bytes than specified file size'
+            'Uploaded more bytes than specified file size',
           ));
         }
       });
@@ -168,7 +168,7 @@ export class FileService {
     if (uploadedSize === fileEntity.size) {
       fileEntity = await this.fileRepository.save({
         id: fileId,
-        uploadedAt: new Date()
+        uploadedAt: new Date(),
       });
     }
 
@@ -192,7 +192,7 @@ export class FileService {
       root: this.filesDirectory,
       headers: {
         'Content-Disposition': 'attachment',
-      }
+      },
     });
   }
 

@@ -7,7 +7,7 @@ import { FileModule } from './file/file.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
-    FileModule
+    FileModule,
   ],
   providers: [
     {
@@ -22,6 +22,6 @@ import { FileModule } from './file/file.module';
         },
       }),
     },
-  ]
+  ],
 })
 export class AppModule {}
